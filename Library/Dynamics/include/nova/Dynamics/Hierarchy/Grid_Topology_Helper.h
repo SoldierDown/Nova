@@ -135,12 +135,10 @@ class Grid_Topology_Helper
 
     static void Face_Neighbor_Offsets(uint64_t face_neighbor_offsets[number_of_faces_per_cell])
     {
-        for(int axis=0,face=0;axis<d;++axis) for(int side=-1;side<=1;side+=2)
-        {
+        for(int axis=0,face=0;axis<d;++axis) for(int side=-1;side<=1;side+=2){   
             T_INDEX shift;
             shift[axis]=side;
-            face_neighbor_offsets[face++]=T_MASK::Linear_Offset(shift._data);
-        }
+            face_neighbor_offsets[face++]=T_MASK::Linear_Offset(shift._data);}
     }
 
     static void Child_Face_Offsets(uint64_t offset,const int axis,uint64_t child_face_offsets[number_of_nodes_per_face])

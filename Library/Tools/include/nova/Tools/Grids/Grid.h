@@ -81,6 +81,7 @@ class Grid
     {
         T_INDEX index;
         Cell(location,index,number_of_ghost_cells);
+        // if(Cell_OOB(index)) Log::cout<<location<<"closest cell OOB: "<<index<<std::endl;
         return index;
     }
 
@@ -105,7 +106,7 @@ class Grid
 
     int Cell_Flatten(const T_INDEX index) const
     {
-        if(Cell_OOB(index)) {std::cout<<"Cell OUT OF BOUNDARY!"<<std::endl;exit(0);}
+        // if(Cell_OOB(index)) {std::cout<<"Cell OUT OF BOUNDARY! "<<index<<std::endl;exit(0);}
         if(d==2) return (index(1)-1)*counts(0)+index(0)-1;
         else return (index(2)-1)*(counts(0)*counts(1))+(index(1)-1)*counts(0)+index(0)-1;
     }
@@ -164,7 +165,7 @@ class Grid
     bool Cell_OOB(const T_INDEX index) const
     {
         if(d==2) return index(0)<1||index(0)>counts(0)||index(1)<1||index(1)>counts(1);
-        else return -1;
+        else return index(0)<1||index(0)>counts(0)||index(1)<1||index(1)>counts(1)||index(2)<1||index(2)>counts(2);
     }
      
     //TODO: 3d

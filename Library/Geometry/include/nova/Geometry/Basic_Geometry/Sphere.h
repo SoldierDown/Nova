@@ -31,6 +31,9 @@ class Sphere
       if(d==2) return pi*radius*radius;
       if(d==3) return four_thirds*pi*radius*radius*radius;
     }
+
+    bool Inside(const TV& X) const
+    {return Signed_Distance(X)<=(T)0.;}
 };
 }
 #endif

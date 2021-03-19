@@ -54,6 +54,7 @@ class Random_Numbers: public Non_Copyable
         Vector<T,d> v=Get_Uniform_Vector(Range<T,d>::Centered_Box(ball.radius));
         if(v.Norm()<=(T)ball.radius) return v;}  
     }
+
 };
 }
 #endif
