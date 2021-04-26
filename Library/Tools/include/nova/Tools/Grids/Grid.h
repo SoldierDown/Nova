@@ -33,6 +33,11 @@ class Grid
         Initialize(counts_input,domain_input);
     }
 
+    const T_INDEX Number_Of_Faces(const int& axis) const 
+    {
+        return counts+T_INDEX::Axis_Vector(axis);
+    }
+
     const T_INDEX& Number_Of_Cells() const
     {return counts;}
 
@@ -71,19 +76,48 @@ class Grid
     Range<int,d> Node_Indices(const int number_of_ghost_cells=0) const
     {return Range<int,d>(T_INDEX(1),Number_Of_Nodes()).Thickened(number_of_ghost_cells);}
 
+
+    Range<int,d> Face_Indices(const int& axis,const int number_of_ghost_cells=0) const
+    {return Range<int,d>(T_INDEX(1),Number_Of_Faces(axis)).Thickened(number_of_ghost_cells);}
+
+
+
     T_INDEX Clamp_To_Cell(const TV& X,const int number_of_ghost_cells=0) const
     {
         T_INDEX index=T_INDEX((X-domain.min_corner)*one_over_dX)+1;
         return Cell_Indices(number_of_ghost_cells).Clamp(index);
     }
     
-    T_INDEX Closest_Cell(const TV& location, const int number_of_ghost_cells=0) const 
+    T_INDEX Bottom_Left_Cell(const TV& location) const
+    {
+        TV cell_domain_min_corner=domain.min_corner+(T).5*dX;
+        T_INDEX index=T_INDEX((location-cell_domain_min_corner)*one_over_dX)+1;     // 1-indexed
+        if(Cell_OOB(index)) {Log::cout<<location<<"bottom-left cell OOB: "<<index<<std::endl;exit(0);}
+        return index;
+    }
+
+    T_INDEX Bottom_Left_Face(const TV& location, const int& axis) const 
+    {
+        TV face_domain_min_corner=domain.min_corner+(T).5*(dX-TV::Axis_Vector(axis)*dX(axis));
+        T_INDEX index=T_INDEX((location-face_domain_min_corner)*one_over_dX)+1;
+        return index;
+    }
+
+    T_INDEX Closest_Cell(const TV& location, const int& number_of_ghost_cells=0) const 
     {
         T_INDEX index;
         Cell(location,index,number_of_ghost_cells);
-        // if(Cell_OOB(index)) Log::cout<<location<<"closest cell OOB: "<<index<<std::endl;
+        if(Cell_OOB(index)) {Log::cout<<location<<"closest cell OOB: "<<index<<std::endl;exit(0);}
         return index;
     }
+
+    T_INDEX Closest_Face(const TV& location, const int& axis) const 
+    {
+        T_INDEX index;
+        Face(location,axis,index);
+        return index;
+    }
+
 
     T_INDEX Closest_Node(const TV& X,const int number_of_ghost_cells=0) const
     {
@@ -104,9 +138,15 @@ class Grid
         index=T_INDEX((location-domain.min_corner)*one_over_dX+number_of_ghost_cells_plus_one)-number_of_ghost_cells;
     }
 
+    void Face(const TV& location,const int& axis,T_INDEX& index) const
+    {
+        TV face_min_corner=domain.min_corner-(T).5*TV::Axis_Vector(axis)*dX(axis);
+        index=T_INDEX((location-face_min_corner)*one_over_dX+1);
+    }
+
     int Cell_Flatten(const T_INDEX index) const
     {
-        // if(Cell_OOB(index)) {std::cout<<"Cell OUT OF BOUNDARY! "<<index<<std::endl;exit(0);}
+        if(Cell_OOB(index)) {std::cout<<"Cell OUT OF BOUNDARY! "<<index<<std::endl;exit(0);}
         if(d==2) return (index(1)-1)*counts(0)+index(0)-1;
         else return (index(2)-1)*(counts(0)*counts(1))+(index(1)-1)*counts(0)+index(0)-1;
     }
